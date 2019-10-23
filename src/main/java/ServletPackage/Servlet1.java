@@ -45,24 +45,75 @@ public class Servlet1 extends HttpServlet {
             out.println("<title>Servlet Servlet1</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet Servlet1 at " + request.getContextPath() + "</h1>");
+            //out.println("<h1>Servlet Servlet1 at " + request.getContextPath() + "</h1>");
             out.println("</body>");
+            out.println("<style>\n" +
+            "table, th, td {\n" +
+            "  border: 1px solid black;\n" +
+            "}\n" +
+            "</style>");
+            
                 try {   // Trouver la valeur du paramètre HTTP customerID
                 String val = request.getParameter("state");
-                if (val == null) {
-                    throw new Exception("La paramètre state n'a pas été transmis");
+                
+                DAledO dao2 = new DAledO(DataSourceFactory.getDataSource());
+                List<String> etats = dao2.getStates();
+                out.println("<form action=\"/AppWeb/Servlet1\" id=\"Sform\">");
+                out.println("<input type=\"submit\">");
+                out.println("</form>");
+
+                out.println("<select name=\"state\"form=\"Sform\">");
+
+                for (int i = 0; i<etats.size(); i++) {
+                    if (val.equals(etats.get(i))){
+                        out.printf("<option value =%s selected>%s</option>",etats.get(i),etats.get(i)); 
+                    }
+                    else{
+                        out.printf("<option value =%s>%s</option>",etats.get(i),etats.get(i));
+                    }
+                       
                 }
+                out.println("</select>");
+                
+                if (val != null) {
+                    //throw new Exception("La paramètre state n'a pas été transmis");
+                
                 
  
                 DAO dao = new DAO(DataSourceFactory.getDataSource());
-                List<CustomerEntity> aled = dao.customersInState(val);
-                    for (int i = 0; i < aled.size(); i++) {
-                        out.printf("%d   name: %s  address: %s <br>",
-                        aled.get(i).getCustomerId(),
-                        aled.get(i).getName(),
-                        aled.get(i).getAddressLine1());
-                    }
                 
+                List<CustomerEntity> aled = dao.customersInState(val);
+
+                
+                out.println("<table>");
+                out.println("<tr>");
+                out.println("<th> Id </th>");
+                out.println("<th> Name </th>");
+                out.println("<th> Address </th>");
+                out.println("</tr>");
+                    for (int i = 0; i < aled.size(); i++) {
+                        out.println("<tr>");
+                        
+                        out.println("<th>");
+                        out.printf("%d", aled.get(i).getCustomerId());
+                        out.println("</th>");
+                        
+                        out.println("<th>");
+                        out.printf("%s", aled.get(i).getName());
+                        out.println("</th>");
+                        
+                        out.println("<th>");
+                        out.printf("%s", aled.get(i).getAddressLine1());
+                        out.println("</th>");
+                        
+                        out.println("</tr>");
+                        
+                        
+                        
+                        
+                    }
+                out.println("</table>");
+                }
             } catch (Exception e) {
                 out.printf("Erreur : %s", e.getMessage());
             }
